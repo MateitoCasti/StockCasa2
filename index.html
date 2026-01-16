@@ -6,10 +6,10 @@
 
   <style>
     body {
-  font-family: 'Segoe UI', 'Times New Roman', Times, serif, sans-serif;
+  font-family: 'Segoe UI', 'Arial', Times, serif, sans-serif;
   background: linear-gradient(135deg, #667eea, #764ba2);
   padding: 20px;
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
 }
 
@@ -23,8 +23,8 @@
 
     ul {
       max-height: 300px;
-      overflow-y: auto;
-      padding-left: 20px;
+      overflow-y: right;
+      padding-left: 1px;
     }
 
     li {
@@ -193,6 +193,7 @@ function interpretarVoz(textoOriginal) {
   recognition.onerror = function () {
     alert("Error al reconocer la voz. Probá de nuevo.");
   };
+recognition.star8();
 
 }
 
