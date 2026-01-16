@@ -9,7 +9,7 @@
   font-family: 'Segoe UI', 'Arial', Times, serif, sans-serif;
   background: linear-gradient(135deg, #667eea, #764ba2);
   padding: 20px;
-  max-width: 600px;
+  max-width: 500px;
   margin: auto;
 }
 
@@ -18,7 +18,7 @@
       padding: 8px;
       margin-bottom: 10px;
       font-size: 16px;
-      border-radius: 30;
+      border-radius: 30px;
     }
 
     ul {
@@ -35,10 +35,10 @@
       margin-left: 5px;
     }
     .card {
-  background: rgba(243, 49, 49, 0.9);
-  backdrop-filter: blur(8px);
+  background: rgba(196, 99, 199, 0.9);
+  backdrop-filter: blur(8050px);
   padding: 20px;
-  border-radius: 25
+  border-radius: 25px
   ;
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
@@ -48,7 +48,7 @@
 
 <body>
 
-
+<div class="card">
 
  <center><h1>📦 Stock del Hogar 📦  </h2></center>
 
@@ -68,6 +68,8 @@
 
   <h2>Lista</h2>
   <ul id="lista"></ul>
+
+</div>
 
 <script>
   const lista = document.getElementById("lista");
@@ -188,13 +190,14 @@ function interpretarVoz(textoOriginal) {
 
     document.getElementById("producto").value = producto;
     document.getElementById("cantidad").value = cantidad;
+    recognition.stop();
   };
 
   recognition.onerror = function () {
+    recognition.stop();
     alert("Error al reconocer la voz. Probá de nuevo.");
   };
-  
-recognition.start();
+
 
 }
 
