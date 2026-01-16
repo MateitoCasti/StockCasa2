@@ -35,7 +35,7 @@
       margin-left: 5px;
     }
     .card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(243, 49, 49, 0.9);
   backdrop-filter: blur(8px);
   padding: 20px;
   border-radius: 25
@@ -193,7 +193,8 @@ function interpretarVoz(textoOriginal) {
   recognition.onerror = function () {
     alert("Error al reconocer la voz. Probá de nuevo.");
   };
-recognition.star8();
+  
+recognition.start();
 
 }
 
