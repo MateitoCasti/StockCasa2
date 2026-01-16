@@ -108,21 +108,47 @@
     }
 
     function hablar() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = "es-AR";
-      recognition.onresult = function(event) {
-        const voz = event.results[0][0].transcript.toLowerCase();
-        const partes = voz.split(" ");
-        if (!isNaN(partes[0])) {
-          document.getElementById("cantidad").value = partes[0];
-          document.getElementById("producto").value = partes.slice(1).join(" ");
-        } else {
-          document.getElementById("cantidad").value = "1";
-          document.getElementById("producto").value = voz;
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "es-AR";
+
+  recognition.onresult = function(event) {
+    let voz = event.results[0][0].transcript.toLowerCase();
+    
+    // Diccionario para convertir números hablados a números reales
+    const numerosALetras = {
+      "un": 1, "uno": 1, "una": 1, "dos": 2, "tres": 3, "cuatro": 4, 
+      "cinco": 5, "seis": 6, "siete": 7, "ocho": 8, "nueve": 9, "diez": 10
+    };
+
+    let cantidadDetectada = 1; // Por defecto 1
+    let productoDetectado = voz;
+
+    // 1. Intentar encontrar números escritos (2, 5, 10...)
+    const matches = voz.match(/\d+/);
+    if (matches) {
+      cantidadDetectada = matches[0];
+      productoDetectado = voz.replace(matches[0], "").trim();
+    } else {
+      // 2. Si no hay números, buscar si dijiste "dos", "tres", etc.
+      const palabras = voz.split(" ");
+      for (let palabra of palabras) {
+        if (numerosALetras[palabra]) {
+          cantidadDetectada = numerosALetras[palabra];
+          productoDetectado = voz.replace(palabra, "").trim();
+          break;
         }
-      };
-      recognition.start();
+      }
     }
+
+    // Limpiar el nombre del producto de palabras sobrantes como "de" (ej: "2 de tomates")
+    productoDetectado = productoDetectado.replace(/^(de|un|una|unos|unas)\s+/, "");
+
+    document.getElementById("cantidad").value = cantidadDetectada;
+    document.getElementById("producto").value = productoDetectado;
+  };
+
+  recognition.start();
+}
   </script>
 </body>
 </html>
