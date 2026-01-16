@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Casa - Control Total</title>
   <style>
+    /* Colores para el Modo Oscuro */
+body.dark-mode {
+  background-color: #1a202c;
+  color: #f7fafc;
+}
+.dark-mode .card-input, .dark-mode li {
+  background-color: #2d3748;
+  color: white;
+  border-color: #4a5568;
+}
+.dark-mode input, .dark-mode select {
+  background-color: #4a5568;
+  color: white;
+  border: 1px solid #718096;
+}
     body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f9f9f9; }
     h1 { text-align: center; color: #333; }
     
@@ -25,7 +40,7 @@
   </style>
 </head>
 <body>
-
+<button onclick="toggleModoOscuro()" style="width: 50px; float: right; background: #4a5568; border-radius: 20px;">🌙</button>
   <h1>📦 Control de Stock</h1>
 
   <div class="formulario">
@@ -59,7 +74,7 @@
   <button onclick="filtrarPorCategoria('Limpieza')" style="width: auto; background: #4299e1; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Limpieza</button>
   <button onclick="filtrarPorCategoria('Almacén')" style="width: auto; background: #f6ad55; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Almacén</button>
 </div>
-
+<button onclick="modoCompras()" style="width: auto; background: #2d3748; color: white; padding: 8px 15px; font-size: 12px; border: 2px solid #ff4d4d; border-radius: 5px;">⚠️ Modo Compras</button>
 <h2>Lista de Stock</h2>
 <ul id="lista"></ul>
 
@@ -213,6 +228,28 @@ function enviarWhatsApp() {
 
   // Abre WhatsApp con el mensaje armado
   window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+  
+  //MODO COMPRA
+
+  function modoCompras() {
+  const productos = document.querySelectorAll("#lista li");
+  productos.forEach(p => {
+    const badge = p.querySelector(".badge-cantidad, .cantidad-badge, .num");
+    const cantidad = parseInt(badge.innerText);
+    
+    // Si tienes 1 o menos, es un faltante
+    if (cantidad <= 1) {
+      p.style.display = "flex";
+      p.style.borderLeft = "6px solid #ff4d4d"; // Resaltamos con rojo
+    } else {
+      p.style.display = "none"; // Ocultamos lo que ya tenemos
+    }
+  });
+}
+
+function toggleModoOscuro() {
+  document.body.classList.toggle("dark-mode");
+}
   </script>
 </body>
 </html>
