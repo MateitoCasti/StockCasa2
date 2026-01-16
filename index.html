@@ -11,7 +11,7 @@
     .formulario { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     input, select, button { width: 100%; padding: 10px; margin: 5px 0 15px 0; box-sizing: border-box; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
     
-    button { background-color: #4CAF50; color: white; border: none; font-weight: bold; cursor: pointer; }
+    button { background-color: #91bd92; color: white; border: none; font-weight: bold; cursor: pointer; }
     button:active { transform: scale(0.98); }
     .btn-voz { background-color: #2196F3; }
     
@@ -26,7 +26,7 @@
 </head>
 <body>
 
-  <h1>📦 Control de Stock 📦</h1>
+  <h1>📦 Control de Stock</h1>
 
   <div class="formulario">
     <label>Producto:</label>
@@ -41,14 +41,24 @@
       <option value="Frutas">🍎 Frutas</option>
       <option value="Limpieza">🧽 Limpieza</option>
       <option value="Almacén">🏠 Almacén</option>
+       <option value="Emprendimiento">🏠 Filamento</option>
     </select>
-
+<label>Fecha de Vencimiento</label>
+<input type="date" id="vencimiento">
     <button onclick="agregarProducto()">Añadir a la lista</button>
     <button class="btn-voz" onclick="hablar()">🎙️ Cargar por Voz</button>
   </div>
 
-  <h2>Lista de Stock</h2>
-  <ul id="lista"></ul>
+ <div style="display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px;">
+  <button onclick="filtrarPorCategoria('Todas')" style="width: auto; background: #94a3b8; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Ver Todo</button>
+  <button onclick="filtrarPorCategoria('Verduras')" style="width: auto; background: #48bb78; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Verduras</button>
+  <button onclick="filtrarPorCategoria('Frutas')" style="width: auto; background: #ed64a6; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Frutas</button>
+  <button onclick="filtrarPorCategoria('Limpieza')" style="width: auto; background: #4299e1; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Limpieza</button>
+  <button onclick="filtrarPorCategoria('Almacén')" style="width: auto; background: #f6ad55; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Almacén</button>
+</div>
+
+<h2>Lista de Stock</h2>
+<ul id="lista"></ul>
 
   <script>
     const lista = document.getElementById("lista");
@@ -66,6 +76,7 @@
       const prod = document.getElementById("producto").value;
       const cant = document.getElementById("cantidad").value;
       const cat = document.getElementById("categoria").value;
+      const fechaVenc = document.getElementById("vencimiento").value
 
       if (prod === "" || cant === "") {
         alert("Escribe el nombre y la cantidad");
@@ -90,6 +101,7 @@
       
       document.getElementById("producto").value = "";
       document.getElementById("cantidad").value = "";
+      
     }
 
     function cambiar(btn, valor) {
@@ -149,7 +161,23 @@
 
   recognition.start();
 }
+function filtrarPorCategoria(categoriaSeleccionada) {
+  // Buscamos todos los "renglones" (li) de tu lista actual
+  const productos = document.querySelectorAll("#lista li");
+
+  productos.forEach(producto => {
+    // Buscamos el texto de la categoría que guardamos en el <small>
+    const textoCategoria = producto.querySelector("small").innerText.toUpperCase();
+    const seleccion = categoriaSeleccionada.toUpperCase();
+
+    // Si tocamos "Todas", mostramos todo. Si no, comparamos.
+    if (categoriaSeleccionada === "Todas" || textoCategoria.includes(seleccion)) {
+      producto.style.display = "flex"; // Se muestra
+    } else {
+      producto.style.display = "none"; // Se esconde
+    }
+  });
+}
   </script>
 </body>
 </html>
-
