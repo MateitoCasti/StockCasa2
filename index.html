@@ -76,6 +76,10 @@ body.dark-mode {
     
     <label>Categoría:</label>
     <select id="categoria">
+      <div style="margin-top: 10px; display: flex; gap: 5px;">
+    <input type="text" id="nuevaCategoria" placeholder="Nueva categoría..." style="flex: 1;">
+    <button onclick="agregarNuevaCategoria()" style="width: auto; background: #4a5568; color: white; padding: 5px 10px; font-size: 12px;">➕ Añadir</button>
+</div>
       <option value="Verduras">🥕 Verduras</option>
       <option value="Frutas">🍎 Frutas</option>
       <option value="Limpieza">🧽 Limpieza</option>
@@ -304,6 +308,66 @@ document.addEventListener("DOMContentLoaded", function() {
 function cerrarBienvenida() {
   document.getElementById("modalBienvenida").style.setProperty("display", "none", "important");
   localStorage.setItem("bienvenidaVista", "true");
+}
+
+// Cargar categorías al iniciar
+document.addEventListener("DOMContentLoaded", function() {
+    cargarCategorias();
+});
+
+function agregarNuevaCategoria() {
+    const input = document.getElementById("nuevaCategoria");
+    const nombre = input.value.trim();
+
+    if (nombre === "") return;
+
+    // Obtener categorías actuales de localStorage o usar las básicas por defecto
+    let categorias = JSON.parse(localStorage.getItem("misCategorias")) || ["Verduras", "Frutas", "Limpieza", "Almacén"];
+    
+    if (!categorias.includes(nombre)) {
+        categorias.push(nombre);
+        localStorage.setItem("misCategorias", JSON.stringify(categorias));
+        cargarCategorias(); // Refrescar el selector
+        input.value = ""; // Limpiar input
+        alert("Categoría añadida: " + nombre);
+    } else {
+        alert("Esta categoría ya existe.");
+    }
+}
+
+function cargarCategorias() {
+    const selector = document.getElementById("categoria");
+    const categorias = JSON.parse(localStorage.getItem("misCategorias")) || ["Verduras", "Frutas", "Limpieza", "Almacén"];
+    
+    // Limpiar el selector actual
+    selector.innerHTML = "";
+    
+    // Llenar con las categorías guardadas
+    categorias.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        selector.appendChild(option);
+    });
+
+    // Opcional: Actualizar también los botones de filtro de arriba
+    actualizarBotonesFiltro(categorias);
+}
+
+function actualizarBotonesFiltro(categorias) {
+    const contenedorFiltros = document.querySelector("div[style*='overflow-x: auto']");
+    if (!contenedorFiltros) return;
+
+    // Mantenemos el botón "Ver Todo"
+    contenedorFiltros.innerHTML = `<button onclick="filtrarPorCategoria('Todas')" style="width: auto; background: #94a3b8; color: white; padding: 8px 15px; border-radius: 5px; border: none;">Ver Todo</button>`;
+
+    categorias.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        btn.style = "width: auto; background: #4a5568; color: white; padding: 8px 15px; border-radius: 5px; border: none; margin-left: 5px;";
+        btn.onclick = () => filtrarPorCategoria(cat);
+        contenedorFiltros.appendChild(btn);
+    });
 }
   </script>
 </body>
