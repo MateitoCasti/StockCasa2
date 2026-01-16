@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Stock del Hogar</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    ul {
+      max-height: 300px;
+      overflow-y: auto;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    button.borrar {
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>📦 Stock del Hogar</h1>
+
+  <input type="text" id="producto" placeholder="Producto (ej: Tomate)">
+  <input type="number" id="cantidad" placeholder="cantidad">
+
+  <select id="categoria">
+    <option value="Verduras">Verduras</option>
+    <option value="Frutas">Frutas</option>
+    <option value="Limpieza">Limpieza</option>
+    <option value="Almacén">Almacén</option>
+    <option value="Otros">Otros</option>
+  </select>
+
+  <button onclick="agregarProducto()">Agregar</button>
+  <button onclick="hablar()">🎙️ Agregar por voz</button>
+
+  <h2>Lista</h2>
+  <ul id="lista"></ul>
+
+<script>
+  const lista = document.getElementById("lista");
+
+  // Cargar datos guardados
+  window.onload = function () {
+    const datos = localStorage.getItem("stock");
+    if (datos) {
+      lista.innerHTML = datos;
+    }
+  };
+
+  function guardar() {
+    localStorage.setItem("stock", lista.innerHTML);
+  }
+
+  function agregarProducto() {
+    const producto = document.getElementById("producto").value;
+    const cantidad = document.getElementById("cantidad").value;
+    const categoria = document.getElementById("categoria").value;
+
+    if (producto === "" || cantidad === "") {
+      alert("Completá producto y cantidad");
+      return;
+    }
+
+    const item = document.createElement("li");
+    item.innerHTML = `
+      ${categoria} | ${cantidad} - ${producto}
+      <button class="borrar" onclick="borrar(this)">❌</button>
+    `;
+
+    lista.appendChild(item);
+    guardar();
+
+    document.getElementById("producto").value = "";
+    document.getElementById("cantidad").value = "";
+  }
+
+  function borrar(boton) {
+    boton.parentElement.remove();
+    guardar();
+  }
+
+  // VOZ
+  function hablar() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+    alert("Tu navegador no soporta reconocimiento de voz");
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = "es-MX";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = function (event) {
+    const texto = event.results[0][0].transcript.toLowerCase();
+    console.log("Escuchado:", texto);
+
+    const partes = texto.split(" ");
+
+    const posibleNumero = parseInt(partes[0]);
+
+    if (isNaN(posibleNumero)) {
+      alert("Decí primero la cantidad. Ejemplo: '2 tomates'");
+      return;
+    }
+
+    const producto = partes.slice(1).join(" ");
+
+    document.getElementById("cantidad").value = posibleNumero;
+    document.getElementById("producto").value = producto;
+  };
+
+  recognition.onerror = function () {
+    alert("Error al reconocer la voz. Probá de nuevo.");
+  };
+
+  recognition.start();
+}
+</script>
+
+</body>
+</html>
