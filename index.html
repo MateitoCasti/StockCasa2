@@ -47,6 +47,9 @@
 <input type="date" id="vencimiento">
     <button onclick="agregarProducto()">Añadir a la lista</button>
     <button class="btn-voz" onclick="hablar()">🎙️ Cargar por Voz</button>
+    <button onclick="enviarWhatsApp()" style="background-color: #25D366; color: white; margin-top: 10px;">
+   📱 Enviar Faltantes por WhatsApp
+</button>
   </div>
 
  <div style="display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px;">
@@ -177,7 +180,27 @@ function filtrarPorCategoria(categoriaSeleccionada) {
       producto.style.display = "none"; // Se esconde
     }
   });
-}
+} //FUNCION ENVIO WSP
+function enviarWhatsApp() {
+  const productos = document.querySelectorAll("#lista li");
+  let mensaje = "🛒 *Lista de Stock/Compras:*%0A";
+  let hayProductos = false;
+
+  productos.forEach(p => {
+    const nombre = p.querySelector("strong").innerText;
+    const cantidad = p.querySelector(".badge-cantidad").innerText;
+    mensaje += `- ${nombre}: ${cantidad} unidades%0A`;
+    hayProductos = true;
+  });
+
+  if (!hayProductos) {
+    alert("La lista está vacía");
+    return;
+  }
+
+  // Abre WhatsApp con el mensaje armado
+  window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+} 
   </script>
 </body>
 </html>
