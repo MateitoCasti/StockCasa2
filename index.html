@@ -6,369 +6,272 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Casa - Control Total</title>
   <style>
-    #modalBienvenida {
-    display: flex !important; /* Esto obliga a que se muestre al principio */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.85);
-    z-index: 9999; /* Lo pone por encima de botones y listas */
-}
-    /* Colores para el Modo Oscuro */
-body.dark-mode {
-  background-color: #1a202c;
-  color: #f7fafc;
-}
-.dark-mode .card-input, .dark-mode li {
-  background-color: #2d3748;
-  color: white;
-  border-color: #4a5568;
-}
-.dark-mode input, .dark-mode select {
-  background-color: #4a5568;
-  color: white;
-  border: 1px solid #718096;
-}
-    body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f9f9f9; }
-    h1 { text-align: center; color: #333; }
+    body { font-family: 'Segoe UI', sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f0f2f5; transition: 0.3s; color: #333; }
+    h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
     
-    .formulario { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    input, select, button { width: 100%; padding: 10px; margin: 5px 0 15px 0; box-sizing: border-box; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
+    .formulario { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; }
+    label { font-weight: 600; font-size: 13px; color: #666; margin-top: 8px; }
+    input, select, button { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e0e0e0; font-size: 16px; box-sizing: border-box; }
     
-    button { background-color: #91bd92; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button:active { transform: scale(0.98); }
-    .btn-voz { background-color: #2196F3; }
+    .btn-principal { background: #91bd92; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn-voz { background: #2196F3; color: white; border: none; font-weight: bold; }
+    .btn-wsp { background: #25D366; color: white; border: none; font-weight: bold; }
+
+    .seccion-nueva-cat { display: flex; gap: 8px; margin-top: 5px; }
+    .btn-add-cat { width: auto; background: #4a5568; color: white; padding: 0 20px; border: none; }
+
+    /* Contenedor de Filtros Corregido */
+    /* Barra de Filtros con Scroll Visible en PC */
+    #contenedorFiltros { 
+      display: flex; 
+      gap: 10px; 
+      overflow-x: auto; 
+      padding: 15px 5px; 
+      cursor: grab; /* Cambia el cursor a una mano para indicar que se puede mover */
+      scrollbar-width: thin; /* Barra fina en Firefox */
+      scrollbar-color: #91bd92 #f0f2f5; 
+    }
+
+    /* Estilo de la barra de scroll para Chrome/Edge */
+    #contenedorFiltros::-webkit-scrollbar {
+      height: 6px;
+    }
+    #contenedorFiltros::-webkit-scrollbar-thumb {
+      background: #cbd5e0;
+      border-radius: 10px;
+    }
     
-    ul { list-style: none; padding: 0; max-height: 400px; overflow-y: auto; }
-    li { background: white; margin-bottom: 10px; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    
-    .controles { display: flex; gap: 5px; }
-    .btn-cant { width: 35px; height: 35px; padding: 0; margin: 0; }
-    .btn-borrar { background-color: #ff4d4d; width: 35px; height: 35px; padding: 0; margin: 0; }
-    .cantidad-badge { background: #eee; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+    .btn-filtro { flex: 0 0 auto; width: auto; background: #fff; color: #4a5568; border: 1px solid #e0e0e0; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; }
+
+    ul { list-style: none; padding: 0; margin-top: 10px; }
+    li { background: white; margin-bottom: 12px; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 6px solid #91bd92; }
+    .num { font-size: 20px; font-weight: 800; color: #2d3748; margin-right: 10px; }
+    .controles { display: flex; gap: 6px; }
+    .btn-cant { width: 38px; height: 38px; padding: 0; background: #f8f9fa; border: 1px solid #eee; color: #333; }
+    .btn-borrar { background: #fff5f5; color: #ff4d4d; border: 1px solid #ffe3e3; width: 38px; }
+
+    /* Modal de Bienvenida - FIX */
+    #modalBienvenida { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 10000; visibility: visible; opacity: 1; transition: 0.3s; }
+    .modal-contenido { background: white; padding: 30px; border-radius: 25px; max-width: 80%; text-align: center; color: #333; }
+
+    body.dark-mode { background: #1a202c; color: white; }
+    .dark-mode .formulario, .dark-mode li, .dark-mode .btn-filtro { background: #2d3748; color: white; border-color: #4a5568; }
+    .dark-mode input, .dark-mode select { background: #4a5568; color: white; border-color: #4a5568; }
   </style>
 </head>
 <body>
-  <div id="modalBienvenida" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-  <div style="background: white; padding: 25px; border-radius: 20px; max-width: 80%; text-align: center; color: #333;">
-    <h2 style="margin-top: 0;">¡Bienvenido a StockCasa! 📦</h2>
-    <p>Esta es una herramienta gratuita para ayudarte a organizar los productos de tu hogar.</p>
-    <ul style="text-align: left; font-size: 14px; margin: 15px 0;">
-      <li>✅ <b>Carga</b> tus productos con fecha de vencimiento.</li>
-      <li>🔍 <b>Usa los filtros</b> para ver qué falta o qué vence pronto.</li>
-      <li>🌙 <b>Modo Oscuro</b> para usarla de noche.</li>
-      <li>📱 <b>Privado:</b> Tus datos se guardan solo en tu celular.</li>
-    </ul>
-    <button onclick="cerrarBienvenida()" style="background: #48bb78; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%;">¡Empezar a organizar!</button>
+
+  <div id="modalBienvenida">
+    <div class="modal-contenido">
+      <h2 style="margin-top:0">¡Bienvenido! 📦</h2>
+      <p>Organiza tu hogar de forma privada.</p>
+      <button onclick="cerrarBienvenida()" style="background: #48bb78; color: white; border: none; padding: 15px; font-weight: bold; cursor:pointer; border-radius: 12px;">¡Entendido!</button>
+    </div>
   </div>
-</div>
-<button onclick="toggleModoOscuro()" style="width: 50px; float: right; background: #4a5568; border-radius: 20px;">🌙</button>
+
+  <button onclick="toggleModoOscuro()" style="width: 50px; float: right; background: #4a5568; border-radius: 50%; color: white; border: none; cursor: pointer; padding: 10px; height: 50px; margin-bottom: 10px;">🌙</button>
+  
+  <div style="clear: both;"></div>
   <h1>📦 Control de Stock</h1>
 
   <div class="formulario">
-    <label>Producto:</label>
-    <input type="text" id="producto" placeholder="Ej: Tomates">
+    <label>Producto</label>
+    <input type="text" id="producto" placeholder="Ej: Leche">
     
-    <label>Cantidad:</label>
-    <input type="number" id="cantidad" placeholder="Ej: 2">
+    <label>Cantidad</label>
+    <input type="number" id="cantidad" placeholder="Cantidad">
     
-    <label>Categoría:</label>
-    <select id="categoria">
-      <div style="margin-top: 10px; display: flex; gap: 5px;">
-    <input type="text" id="nuevaCategoria" placeholder="Nueva categoría..." style="flex: 1;">
-    <button onclick="agregarNuevaCategoria()" style="width: auto; background: #4a5568; color: white; padding: 5px 10px; font-size: 12px;">➕ Añadir</button>
-</div>
-      <option value="Verduras">🥕 Verduras</option>
-      <option value="Frutas">🍎 Frutas</option>
-      <option value="Limpieza">🧽 Limpieza</option>
-      <option value="Almacén">🏠 Almacén</option>
-       <option value="Emprendimiento">🏠 Filamento</option>
-    </select>
-<label>Fecha de Vencimiento</label>
-<input type="date" id="vencimiento" style="width: 180px; display: block; margin-bottom: 10px;">
-    <button onclick="agregarProducto()">Añadir a la lista</button>
+    <label>Categoría</label>
+    <select id="categoria"></select>
+
+    <div class="seccion-nueva-cat">
+      <input type="text" id="nuevaCategoria" placeholder="Nueva..." style="margin:0">
+      <button class="btn-add-cat" onclick="agregarNuevaCategoria()">➕</button>
+    </div>
+    
+    <button onclick="restablecerCategorias()" style="background: none; color: #ed8936; font-size: 11px; border: none; cursor: pointer; text-decoration: underline;">Restablecer originales</button>
+
+    <label>Vencimiento</label>
+    <input type="date" id="vencimiento">
+
+    <button class="btn-principal" onclick="agregarProducto()">Añadir a la lista</button>
     <button class="btn-voz" onclick="hablar()">🎙️ Cargar por Voz</button>
-    <button onclick="enviarWhatsApp()" style="background-color: #25D366; color: white; margin-top: 10px;">
-   📱 Enviar Faltantes por WhatsApp
-</button>
+    <button class="btn-wsp" onclick="enviarWhatsApp()">📱 Enviar por WhatsApp</button>
   </div>
 
- <div style="display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px;">
-  <button onclick="filtrarPorCategoria('Todas')" style="width: auto; background: #94a3b8; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Ver Todo</button>
-  <button onclick="filtrarPorCategoria('Verduras')" style="width: auto; background: #48bb78; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Verduras</button>
-  <button onclick="filtrarPorCategoria('Frutas')" style="width: auto; background: #ed64a6; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Frutas</button>
-  <button onclick="filtrarPorCategoria('Limpieza')" style="width: auto; background: #4299e1; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Limpieza</button>
-  <button onclick="filtrarPorCategoria('Almacén')" style="width: auto; background: #f6ad55; padding: 8px 15px; font-size: 12px; color: white; border: none; border-radius: 5px;">Almacén</button>
-</div>
-<button onclick="modoCompras()" style="width: auto; background: #2d3748; color: white; padding: 8px 15px; font-size: 12px; border: 2px solid #ff4d4d; border-radius: 5px;">⚠️ Modo Compras</button>
-<h2>Lista de Stock</h2>
-<ul id="lista"></ul>
+  <div id="contenedorFiltros"></div>
+
+  <h2 style="font-size: 18px; margin-left: 5px;">Lista de Productos</h2>
+  <ul id="lista"></ul>
 
   <script>
     const lista = document.getElementById("lista");
 
-    window.onload = function() {
+    document.addEventListener("DOMContentLoaded", () => {
       const guardado = localStorage.getItem("miStockPersonal");
-      if (guardado) { lista.innerHTML = guardado; }
-    };
+      if (guardado) lista.innerHTML = guardado;
+      
+      cargarCategorias();
 
-    function guardar() {
-      localStorage.setItem("miStockPersonal", lista.innerHTML);
+      // Fix Bienvenida: Forzamos el cierre si ya se vio
+      if (localStorage.getItem("bienvenidaVista") === "true") {
+        document.getElementById("modalBienvenida").style.display = "none";
+      }
+    });
+
+    function cerrarBienvenida() {
+      document.getElementById("modalBienvenida").style.display = "none";
+      localStorage.setItem("bienvenidaVista", "true");
+    }
+
+    function guardar() { localStorage.setItem("miStockPersonal", lista.innerHTML); }
+
+    function cargarCategorias() {
+      const selector = document.getElementById("categoria");
+      const cats = JSON.parse(localStorage.getItem("misCategorias")) || ["🥕 Verduras", "🍎 Frutas", "🧽 Limpieza", "🏠 Almacén"];
+      selector.innerHTML = "";
+      cats.forEach(c => {
+        let opt = document.createElement("option");
+        opt.value = c; opt.textContent = c;
+        selector.appendChild(opt);
+      });
+      actualizarBotonesFiltro(cats);
+    }
+
+    function actualizarBotonesFiltro(cats) {
+      const cont = document.getElementById("contenedorFiltros");
+      cont.innerHTML = "";
+      
+      const btnT = document.createElement("button");
+      btnT.className = "btn-filtro"; btnT.innerText = "Ver Todo";
+      btnT.onclick = () => filtrarPorCategoria('Todas');
+      cont.appendChild(btnT);
+
+      cats.forEach(c => {
+        const b = document.createElement("button");
+        b.className = "btn-filtro"; b.innerText = c;
+        b.onclick = () => filtrarPorCategoria(c);
+        cont.appendChild(b);
+      });
+
+      const btnC = document.createElement("button");
+      btnC.className = "btn-filtro"; btnC.innerText = "⚠️ Compras";
+      btnC.style.borderColor = "#ff4d4d"; btnC.style.color = "#ff4d4d";
+      btnC.onclick = () => modoCompras();
+      cont.appendChild(btnC);
+    }
+
+    function filtrarPorCategoria(cat) {
+      document.querySelectorAll("#lista li").forEach(li => {
+        const txt = li.querySelector("small").innerText;
+        li.style.display = (cat === "Todas" || txt.includes(cat)) ? "flex" : "none";
+      });
+    }
+
+    function modoCompras() {
+      document.querySelectorAll("#lista li").forEach(li => {
+        const n = parseInt(li.querySelector(".num").innerText);
+        li.style.display = (n <= 1) ? "flex" : "none";
+      });
+    }
+
+    function agregarNuevaCategoria() {
+      const val = document.getElementById("nuevaCategoria").value.trim();
+      if (!val) return;
+      let cats = JSON.parse(localStorage.getItem("misCategorias")) || ["🥕 Verduas", "🍎 Frutas", "🧽 Limpieza", "🏠 Almacén"];
+      if (!cats.includes(val)) {
+        cats.push(val);
+        localStorage.setItem("misCategorias", JSON.stringify(cats));
+        cargarCategorias();
+        document.getElementById("nuevaCategoria").value = "";
+      }
     }
 
     function agregarProducto() {
-      const prod = document.getElementById("producto").value;
-      const cant = document.getElementById("cantidad").value;
+      const p = document.getElementById("producto").value;
+      const c = document.getElementById("cantidad").value;
       const cat = document.getElementById("categoria").value;
-      const fechaVenc = document.getElementById("vencimiento").value
+      const f = document.getElementById("vencimiento").value;
+      if (!p || !c) return alert("Faltan datos");
 
-      if (prod === "" || cant === "") {
-        alert("Escribe el nombre y la cantidad");
-        return;
-      }
-
-      const item = document.createElement("li");
-      item.innerHTML = `
-        <div>
-          <small>${cat}</small><br>
-          <strong>${prod}</strong>: <span class="num">${cant}</span>
-        </div>
-        <div class="controles">
-          <button class="btn-cant" onclick="cambiar(this, 1)">+</button>
-          <button class="btn-cant" onclick="cambiar(this, -1)">-</button>
-          <button class="btn-borrar" onclick="borrar(this)">❌</button>
-        </div>
-      `;
-
-      lista.appendChild(item);
+      const li = document.createElement("li");
+      li.innerHTML = `<div><small>${cat}</small><br><strong>${p}</strong>${f ? `<br><small>📅 ${f}</small>` : ''}</div>
+      <div style="display:flex; align-items:center"><span class="num">${c}</span>
+      <div class="controles"><button class="btn-cant" onclick="cambiar(this,1)">+</button><button class="btn-cant" onclick="cambiar(this,-1)">-</button><button class="btn-borrar" onclick="borrar(this)">❌</button></div></div>`;
+      lista.appendChild(li);
       guardar();
-      
       document.getElementById("producto").value = "";
       document.getElementById("cantidad").value = "";
-      
     }
 
-    function cambiar(btn, valor) {
-      const li = btn.closest("li");
-      const span = li.querySelector(".num");
-      let actual = parseInt(span.innerText);
-      let nuevo = actual + valor;
-      if (nuevo < 0) nuevo = 0;
-      span.innerText = nuevo;
+    function cambiar(b, v) {
+      const s = b.closest("li").querySelector(".num");
+      s.innerText = Math.max(0, parseInt(s.innerText) + v);
       guardar();
     }
 
-    function borrar(btn) {
-      btn.closest("li").remove();
-      guardar();
+    function borrar(b) { if(confirm("¿Eliminar?")) { b.closest("li").remove(); guardar(); } }
+
+    function toggleModoOscuro() { document.body.classList.toggle("dark-mode"); }
+
+    function enviarWhatsApp() {
+      let m = "🛒 *Faltantes:*%0A";
+      document.querySelectorAll("#lista li").forEach(li => {
+        if (li.style.display !== "none") m += `• ${li.querySelector("strong").innerText}: ${li.querySelector(".num").innerText}%0A`;
+      });
+      window.open("https://wa.me/?text=" + m, '_blank');
+    }
+
+    function restablecerCategorias() {
+      if (confirm("¿Borrar categorías?")) {
+        localStorage.removeItem("misCategorias");
+        cargarCategorias();
+      }
     }
 
     function hablar() {
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = "es-AR";
-
-  recognition.onresult = function(event) {
-    let voz = event.results[0][0].transcript.toLowerCase();
-    
-    // Diccionario para convertir números hablados a números reales
-    const numerosALetras = {
-      "un": 1, "uno": 1, "una": 1, "dos": 2, "tres": 3, "cuatro": 4, 
-      "cinco": 5, "seis": 6, "siete": 7, "ocho": 8, "nueve": 9, "diez": 10
-    };
-
-    let cantidadDetectada = 1; // Por defecto 1
-    let productoDetectado = voz;
-
-    // 1. Intentar encontrar números escritos (2, 5, 10...)
-    const matches = voz.match(/\d+/);
-    if (matches) {
-      cantidadDetectada = matches[0];
-      productoDetectado = voz.replace(matches[0], "").trim();
-    } else {
-      // 2. Si no hay números, buscar si dijiste "dos", "tres", etc.
-      const palabras = voz.split(" ");
-      for (let palabra of palabras) {
-        if (numerosALetras[palabra]) {
-          cantidadDetectada = numerosALetras[palabra];
-          productoDetectado = voz.replace(palabra, "").trim();
-          break;
-        }
-      }
+      const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Speech) return alert("Voz no soportada en este navegador");
+      const r = new Speech();
+      r.lang = "es-AR";
+      r.onresult = (e) => { document.getElementById("producto").value = e.results[0][0].transcript.toLowerCase(); };
+      r.start();
     }
 
-    // Limpiar el nombre del producto de palabras sobrantes como "de" (ej: "2 de tomates")
-    productoDetectado = productoDetectado.replace(/^(de|un|una|unos|unas)\s+/, "");
+    // Permite mover la barra de categorías con la rueda del mouse en PC
+const scrollContenedor = document.getElementById("contenedorFiltros");
 
-    document.getElementById("cantidad").value = cantidadDetectada;
-    document.getElementById("producto").value = productoDetectado;
-  };
-
-  recognition.start();
-}
-function filtrarPorCategoria(categoriaSeleccionada) {
-  // Buscamos todos los "renglones" (li) de tu lista actual
-  const productos = document.querySelectorAll("#lista li");
-
-  productos.forEach(producto => {
-    // Buscamos el texto de la categoría que guardamos en el <small>
-    const textoCategoria = producto.querySelector("small").innerText.toUpperCase();
-    const seleccion = categoriaSeleccionada.toUpperCase();
-
-    // Si tocamos "Todas", mostramos todo. Si no, comparamos.
-    if (categoriaSeleccionada === "Todas" || textoCategoria.includes(seleccion)) {
-      producto.style.display = "flex"; // Se muestra
-    } else {
-      producto.style.display = "none"; // Se esconde
-    }
-  });
-} //FUNCION ENVIO WSP
-function enviarWhatsApp() {
-  const listaProductos = document.getElementById("lista");
-  const items = listaProductos.getElementsByTagName("li");
-  
-  if (items.length === 0) {
-    alert("Tu lista está vacía, cargá algo primero.");
-    return;
-  }
-
-  let mensaje = "🛒 *Mi Inventario de Stock:*%0A%0A";
-
-  for (let i = 0; i < items.length; i++) {
-    // Buscamos el nombre (que está en un strong)
-    const nombre = items[i].querySelector("strong").innerText;
-    
-    // Buscamos la cantidad. Si no encuentra la clase, busca el primer número que vea
-    let cantidad = "1";
-    const badge = items[i].querySelector(".badge-cantidad, .cantidad-badge, .num");
-    if (badge) {
-      cantidad = badge.innerText;
-    }
-
-    mensaje += `✅ *${nombre}*: ${cantidad}%0A`;
-  }
-
-  // Esto obliga al navegador a abrir la pestaña
-  const url = "https://wa.me/?text=" + mensaje;
-  window.open(url, '_blank').focus();
-}
-
-  // Abre WhatsApp con el mensaje armado
-  window.open(`https://wa.me/?text=${mensaje}`, '_blank');
-  
-  //MODO COMPRA
-
-  function modoCompras() {
-  const productos = document.querySelectorAll("#lista li");
-  productos.forEach(p => {
-    const badge = p.querySelector(".badge-cantidad, .cantidad-badge, .num");
-    const cantidad = parseInt(badge.innerText);
-    
-    // Si tienes 1 o menos, es un faltante
-    if (cantidad <= 1) {
-      p.style.display = "flex";
-      p.style.borderLeft = "6px solid #ff4d4d"; // Resaltamos con rojo
-    } else {
-      p.style.display = "none"; // Ocultamos lo que ya tenemos
-    }
-  });
-}
-
-function toggleModoOscuro() {
-  document.body.classList.toggle("dark-mode");
-}
-
-// Al cargar la página, revisamos si ya vio la bienvenida
-window.onload = function() {
-  if (localStorage.getItem("bienvenidaVista") === "true") {
-    document.getElementById("modalBienvenida").style.display = "none";
-  }
-};
-
-function cerrarBienvenida() {
-  document.getElementById("modalBienvenida").style.display = "none";
-  // Guardamos en el navegador que ya la vio
-  localStorage.setItem("bienvenidaVista", "true");
-}
-
-// Esta función se ejecuta apenas carga la página
-document.addEventListener("DOMContentLoaded", function() {
-  const yaLoVio = localStorage.getItem("bienvenidaVista");
-  const modal = document.getElementById("modalBienvenida");
-
-  if (yaLoVio === "true") {
-    modal.style.setProperty("display", "none", "important");
-  } else {
-    console.log("Mostrando bienvenida por primera vez");
-    modal.style.setProperty("display", "flex", "important");
-  }
+scrollContenedor.addEventListener("wheel", (evt) => {
+    evt.preventDefault();
+    scrollContenedor.scrollLeft += evt.deltaY;
 });
 
-function cerrarBienvenida() {
-  document.getElementById("modalBienvenida").style.setProperty("display", "none", "important");
-  localStorage.setItem("bienvenidaVista", "true");
-}
+// Opcional: Permitir arrastrar con el click del mouse (estilo celular en PC)
+let isDown = false;
+let startX;
+let scrollLeft;
 
-// Cargar categorías al iniciar
-document.addEventListener("DOMContentLoaded", function() {
-    cargarCategorias();
+scrollContenedor.addEventListener('mousedown', (e) => {
+  isDown = true;
+  scrollContenedor.style.cursor = 'grabbing';
+  startX = e.pageX - scrollContenedor.offsetLeft;
+  scrollLeft = scrollContenedor.scrollLeft;
 });
-
-function agregarNuevaCategoria() {
-    const input = document.getElementById("nuevaCategoria");
-    const nombre = input.value.trim();
-
-    if (nombre === "") return;
-
-    // Obtener categorías actuales de localStorage o usar las básicas por defecto
-    let categorias = JSON.parse(localStorage.getItem("misCategorias")) || ["Verduras", "Frutas", "Limpieza", "Almacén"];
-    
-    if (!categorias.includes(nombre)) {
-        categorias.push(nombre);
-        localStorage.setItem("misCategorias", JSON.stringify(categorias));
-        cargarCategorias(); // Refrescar el selector
-        input.value = ""; // Limpiar input
-        alert("Categoría añadida: " + nombre);
-    } else {
-        alert("Esta categoría ya existe.");
-    }
-}
-
-function cargarCategorias() {
-    const selector = document.getElementById("categoria");
-    const categorias = JSON.parse(localStorage.getItem("misCategorias")) || ["Verduras", "Frutas", "Limpieza", "Almacén"];
-    
-    // Limpiar el selector actual
-    selector.innerHTML = "";
-    
-    // Llenar con las categorías guardadas
-    categorias.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        selector.appendChild(option);
-    });
-
-    // Opcional: Actualizar también los botones de filtro de arriba
-    actualizarBotonesFiltro(categorias);
-}
-
-function actualizarBotonesFiltro(categorias) {
-    const contenedorFiltros = document.querySelector("div[style*='overflow-x: auto']");
-    if (!contenedorFiltros) return;
-
-    // Mantenemos el botón "Ver Todo"
-    contenedorFiltros.innerHTML = `<button onclick="filtrarPorCategoria('Todas')" style="width: auto; background: #94a3b8; color: white; padding: 8px 15px; border-radius: 5px; border: none;">Ver Todo</button>`;
-
-    categorias.forEach(cat => {
-        const btn = document.createElement("button");
-        btn.textContent = cat;
-        btn.style = "width: auto; background: #4a5568; color: white; padding: 8px 15px; border-radius: 5px; border: none; margin-left: 5px;";
-        btn.onclick = () => filtrarPorCategoria(cat);
-        contenedorFiltros.appendChild(btn);
-    });
-}
+scrollContenedor.addEventListener('mouseleave', () => {
+  isDown = false;
+  scrollContenedor.style.cursor = 'grab';
+});
+scrollContenedor.addEventListener('mouseup', () => {
+  isDown = false;
+  scrollContenedor.style.cursor = 'grab';
+});
+scrollContenedor.addEventListener('mousemove', (e) => {
+  if(!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - scrollContenedor.offsetLeft;
+  const walk = (x - startX) * 2; // Velocidad de movimiento
+  scrollContenedor.scrollLeft = scrollLeft - walk;
+});
   </script>
 </body>
 </html>
