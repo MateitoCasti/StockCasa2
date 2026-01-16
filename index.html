@@ -40,6 +40,19 @@ body.dark-mode {
   </style>
 </head>
 <body>
+  <div id="modalBienvenida" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+  <div style="background: white; padding: 25px; border-radius: 20px; max-width: 80%; text-align: center; color: #333;">
+    <h2 style="margin-top: 0;">¡Bienvenido a StockCasa! 📦</h2>
+    <p>Esta es una herramienta gratuita para ayudarte a organizar los productos de tu hogar.</p>
+    <ul style="text-align: left; font-size: 14px; margin: 15px 0;">
+      <li>✅ <b>Carga</b> tus productos con fecha de vencimiento.</li>
+      <li>🔍 <b>Usa los filtros</b> para ver qué falta o qué vence pronto.</li>
+      <li>🌙 <b>Modo Oscuro</b> para usarla de noche.</li>
+      <li>📱 <b>Privado:</b> Tus datos se guardan solo en tu celular.</li>
+    </ul>
+    <button onclick="cerrarBienvenida()" style="background: #48bb78; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%;">¡Empezar a organizar!</button>
+  </div>
+</div>
 <button onclick="toggleModoOscuro()" style="width: 50px; float: right; background: #4a5568; border-radius: 20px;">🌙</button>
   <h1>📦 Control de Stock</h1>
 
@@ -59,7 +72,7 @@ body.dark-mode {
        <option value="Emprendimiento">🏠 Filamento</option>
     </select>
 <label>Fecha de Vencimiento</label>
-<input type="date" id="vencimiento">
+<input type="date" id="vencimiento" style="width: 180px; display: block; margin-bottom: 10px;">
     <button onclick="agregarProducto()">Añadir a la lista</button>
     <button class="btn-voz" onclick="hablar()">🎙️ Cargar por Voz</button>
     <button onclick="enviarWhatsApp()" style="background-color: #25D366; color: white; margin-top: 10px;">
@@ -249,6 +262,19 @@ function enviarWhatsApp() {
 
 function toggleModoOscuro() {
   document.body.classList.toggle("dark-mode");
+}
+
+// Al cargar la página, revisamos si ya vio la bienvenida
+window.onload = function() {
+  if (localStorage.getItem("bienvenidaVista") === "true") {
+    document.getElementById("modalBienvenida").style.display = "none";
+  }
+};
+
+function cerrarBienvenida() {
+  document.getElementById("modalBienvenida").style.display = "none";
+  // Guardamos en el navegador que ya la vio
+  localStorage.setItem("bienvenidaVista", "true");
 }
   </script>
 </body>
