@@ -182,25 +182,37 @@ function filtrarPorCategoria(categoriaSeleccionada) {
   });
 } //FUNCION ENVIO WSP
 function enviarWhatsApp() {
-  const productos = document.querySelectorAll("#lista li");
-  let mensaje = "🛒 *Lista de Stock/Compras:*%0A";
-  let hayProductos = false;
-
-  productos.forEach(p => {
-    const nombre = p.querySelector("strong").innerText;
-    const cantidad = p.querySelector(".badge-cantidad").innerText;
-    mensaje += `- ${nombre}: ${cantidad} unidades%0A`;
-    hayProductos = true;
-  });
-
-  if (!hayProductos) {
-    alert("La lista está vacía");
+  const listaProductos = document.getElementById("lista");
+  const items = listaProductos.getElementsByTagName("li");
+  
+  if (items.length === 0) {
+    alert("Tu lista está vacía, cargá algo primero.");
     return;
   }
 
+  let mensaje = "🛒 *Mi Inventario de Stock:*%0A%0A";
+
+  for (let i = 0; i < items.length; i++) {
+    // Buscamos el nombre (que está en un strong)
+    const nombre = items[i].querySelector("strong").innerText;
+    
+    // Buscamos la cantidad. Si no encuentra la clase, busca el primer número que vea
+    let cantidad = "1";
+    const badge = items[i].querySelector(".badge-cantidad, .cantidad-badge, .num");
+    if (badge) {
+      cantidad = badge.innerText;
+    }
+
+    mensaje += `✅ *${nombre}*: ${cantidad}%0A`;
+  }
+
+  // Esto obliga al navegador a abrir la pestaña
+  const url = "https://wa.me/?text=" + mensaje;
+  window.open(url, '_blank').focus();
+}
+
   // Abre WhatsApp con el mensaje armado
   window.open(`https://wa.me/?text=${mensaje}`, '_blank');
-} 
   </script>
 </body>
 </html>
