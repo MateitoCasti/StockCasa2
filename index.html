@@ -58,6 +58,7 @@
 
 <script>
   const lista = document.getElementById("lista");
+
   const numeros = {
   "uno": 1,
   "una": 1,
@@ -72,11 +73,19 @@
   "diez": 10
 };
 
-function interpretarVoz(texto) {
-  texto = texto.toLowerCase();
+function limpiarTexto(texto) {
+  return texto
+    .toLowerCase()
+    .replace(/[.,]/g, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function interpretarVoz(textoOriginal) {
+  const texto = limpiarTexto(textoOriginal);
+  const palabras = texto.split(" ");
 
   let cantidad = 1;
-  let palabras = texto.split(" ");
 
   for (let palabra of palabras) {
     if (!isNaN(palabra)) {
@@ -90,11 +99,16 @@ function interpretarVoz(texto) {
   }
 
   const producto = palabras
-    .filter(p => isNaN(p) && !numeros[p] && p !== "agregar")
+    .filter(p =>
+      isNaN(p) &&
+      !numeros[p] &&
+      !["agregar", "anadir", "añadir"].includes(p)
+    )
     .join(" ");
 
   return { producto, cantidad };
 }
+
 
 
   // Cargar datos guardados
@@ -138,37 +152,24 @@ function interpretarVoz(texto) {
   }
 
   // VOZ
-  function hablar() {
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-    alert("Tu navegador no soporta reconocimiento de voz");
-    return;
-  }
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-
-  recognition.lang = "es-AR";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
   recognition.onresult = function (event) {
-    const texto = event.results[0][0].transcript.toLowerCase();
-    console.log("Escuchado:", texto);
+  const texto = event.results[0][0].transcript;
+  console.log("Escuchado:", texto);
 
-    const { producto, cantidad } = interpretarVoz(texto);
+  const { producto, cantidad } = interpretarVoz(texto);
 
-document.getElementById("cantidad").value = cantidad;
-document.getElementById("producto").value = producto;
+  document.getElementById("cantidad").value = cantidad;
+  document.getElementById("producto").value = producto;
+};
 
-  };
 
   recognition.onerror = function () {
     alert("Error al reconocer la voz. Probá de nuevo.");
   };
 
   recognition.start();
-}
 </script>
 
 </body>
 </html>
+
